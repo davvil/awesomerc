@@ -13,6 +13,7 @@ local menubar = require("menubar")
 
 local sharetags = require("sharetags")
 local myprompt = require("myprompt")
+local vicious = require("vicious")
 --local APW=require("apw/widget")
 
 -- {{{ Error handling
@@ -92,7 +93,7 @@ local sharetags_taglist = require("sharetags.taglist")
 
 if not sharetags.restore_taglist("/home/david/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
-    sharetags.add_tag("web", awful.layout.suit.tile)
+    sharetags.add_tag("web", awful.layout.suit.tile.left)
     sharetags.add_tag("laptop", awful.layout.suit.tile)
     sharetags.add_tag("IM", awful.layout.suit.tile)
 end
@@ -150,10 +151,13 @@ xrandrmenu = {
 }
 
 mymainmenu = awful.menu({ items = {
+    { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
+    { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
     { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
     { "Kodi", "kodiBeamer", "/usr/share/kodi/media/icon32x32.png" },
     { "Video", videomenu },
     { "XRandR", xrandrmenu },
+    { "Nuance laptop", "rdesk-nuanceLaptop.sh", os.getenv("HOME") .. "/.icons/nuance.png" },
     { "Nuance VPN", "toggleNuanceVpn", os.getenv("HOME") .. "/.icons/nuance.png" },
     { "awesome", myawesomemenu, beautiful.awesome_icon },
     { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
@@ -183,6 +187,19 @@ nuanceVpnTimer = timer({ timeout = 30 })
 nuanceVpnTimer:connect_signal("timeout", nuanceVpnUpdate)
 nuanceVpnTimer:start()
 -- }}}
+
+--- {{{ MPD
+mpdwidget = wibox.widget.textbox()
+-- Register widget
+vicious.register(mpdwidget, vicious.widgets.mpd,
+    function (mpdwidget, args)
+        if args["{state}"] == "Stop" then 
+            return " MPD "
+        else 
+            return " "..args["{Artist}"]..' - '.. args["{Title}"].." "
+        end
+    end, 11)
+--- }}}
 
 -- {{{ Wibox
 -- Create a textclock widget
@@ -269,6 +286,7 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
+    right_layout:add(mpdwidget)
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(nuanceVpnWidget)
     right_layout:add(mylayoutbox[s])
@@ -309,18 +327,34 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
 
     -- Layout manipulation
-    awful.key({ modkey,           }, "F1", function () awful.layout.set(layouts[1])   end),
-    awful.key({ modkey,           }, "F2", function () awful.layout.set(layouts[2])   end),
-    awful.key({ modkey,           }, "F3", function () awful.layout.set(layouts[3])   end),
-    awful.key({ modkey,           }, "F4", function () awful.layout.set(layouts[4])   end),
-    awful.key({ modkey,           }, "F5", function () awful.layout.set(layouts[5])   end),
-    awful.key({ modkey,           }, "F6", function () awful.layout.set(layouts[6])   end),
+    --awful.key({ modkey,           }, "F1", function () awful.layout.set(layouts[1])   end),
+    awful.key({ modkey,           }, "F1", function ()
+            curLayout = awful.layout.get(mouse.screen)
+            curLayoutName = awful.layout.getname(curLayout)
+            if curLayoutName == "tileleft" then
+                awful.layout.set(layouts[2])
+            elseif curLayoutName == "tile" then
+                awful.layout.set(layouts[1])
+            else
+                for name,_ in pairs(screen[mouse.screen].outputs) do
+                    if name == "HDMI-0" then -- Benq
+                        awful.layout.set(layouts[1])
+                    else
+                        awful.layout.set(layouts[2])
+                    end
+                end
+            end
+        end),
+    awful.key({ modkey,           }, "F2", function () awful.layout.set(layouts[3])   end),
+    awful.key({ modkey,           }, "F3", function () awful.layout.set(layouts[4])   end),
+    awful.key({ modkey,           }, "F4", function () awful.layout.set(layouts[5])   end),
+    awful.key({ modkey,           }, "F5", function () awful.layout.set(layouts[6])   end),
 
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
-    awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
-    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
-    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
+    awful.key({ modkey,           }, "i", function () awful.screen.focus_relative( 1) end),
+    awful.key({ modkey,           }, "u", function () awful.screen.focus_relative(-1) end),
+    --awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
         function ()
             awful.client.focus.history.previous()
@@ -347,7 +381,8 @@ globalkeys = awful.util.table.join(
     --awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey },            "r",     function () mymainmenu:toggle() end),
+    awful.key({ modkey, "Shift" },   "r",     function () mypromptbox[mouse.screen]:run() end),
     awful.key({ }, "F13",
               function ()
                   local completeFunc = function(cmd, cur_pos, ncomp) return awful.completion.generic(cmd, cur_pos, ncomp, sharetags.tagnames) end
@@ -535,8 +570,12 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
+    { rule = { class = "XEyes" },
+      properties = { floating = true, sticky = true,
+                     skip_taskbar = true, border_width = 0,
+                     focusable = false } },
+    { rule = { name = "rdesktop - 10.0.0.5" },
+      properties = { border_width = 0 } }
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
