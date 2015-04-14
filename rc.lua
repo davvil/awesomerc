@@ -15,6 +15,9 @@ local sharetags = require("sharetags")
 local myprompt = require("myprompt")
 local vicious = require("vicious")
 
+local hostname = os.getenv("HOST")
+function nuanceLaptop() return hostname ~= "arch-ac-nb-vilar" end
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -93,7 +96,9 @@ local sharetags_taglist = require("sharetags.taglist")
 if not sharetags.restore_taglist("/home/david/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
     sharetags.add_tag("web", awful.layout.suit.tile.left)
-    sharetags.add_tag("laptop", awful.layout.suit.max)
+    if not nuanceLaptop() then
+        sharetags.add_tag("laptop", awful.layout.suit.max)
+    end
     sharetags.add_tag("IM", awful.layout.suit.tile)
 end
 
@@ -105,27 +110,22 @@ awesome.connect_signal("exit",
     end)
 
 
-for s=1,screen.count() do
-    for name,_ in pairs(screen[s].outputs) do
-        if name == "HDMI-0" then -- Benq
-            sharetags.select_tag(sharetags.tags["web"], screen[s].index)
-        elseif name == "DVI-D-0" then -- Samsung
-            sharetags.select_tag(sharetags.tags["general"], screen[s].index)
-        elseif name == "DVI-I-0" then -- Samsung
-            sharetags.add_tag("Beamer", awful.layout.suit.max)
-            sharetags.select_tag(sharetags.tags["Beamer"], screen[s].index)
+if not nuanceLaptop() then
+    for s=1,screen.count() do
+        for name,_ in pairs(screen[s].outputs) do
+            if name == "HDMI-0" then -- Benq
+                sharetags.select_tag(sharetags.tags["web"], screen[s].index)
+            elseif name == "DVI-D-0" then -- Samsung
+                sharetags.select_tag(sharetags.tags["general"], screen[s].index)
+            elseif name == "DVI-I-0" then -- Samsung
+                sharetags.add_tag("Beamer", awful.layout.suit.max)
+                sharetags.select_tag(sharetags.tags["Beamer"], screen[s].index)
+            end
         end
     end
+else
+    sharetags.select_tag(sharetags.tags["general"], 1)
 end
-
---mytaglist = {}
---for s = 1, screen.count() do
---    -- Create a taglist widget
---    --mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, buttons)
---    --mytaglist[s] = sharetags_taglist(sharetags.tags, s, awful.widget.taglist.filter.all, buttons)
---    mytaglist[s] = sharetags_taglist(sharetags.tags, s, function(t, args) return t.selected end, buttons)
---end
--- }}}
 
 -- {{{ Menu
 -- Create a laucher widget and a main menu
@@ -136,34 +136,46 @@ myawesomemenu = {
    { "quit", awesome.quit }
 }
 
-videomenu = {
-    { "Netflix", "netflixBeamer" },
-    { "Kodi", "kodiBeamer" },
-    { "Netflix (all screens)", "netflixBeamerAllScreens" },
-    { "Kodi (all screens)", "kodiBeamerAllScreens" }
-}
+if not nuanceLaptop() then
+    videomenu = {
+        { "Netflix", "netflixBeamer" },
+        { "Kodi", "kodiBeamer" },
+        { "Netflix (all screens)", "netflixBeamerAllScreens" },
+        { "Kodi (all screens)", "kodiBeamerAllScreens" }
+    }
 
-xrandrmenu = {
-    { "Dual", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --right-of HDMI-0 --auto --output DVI-I-0 --off" },
-    { "Big", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --off --output DVI-I-0 --off" },
-    { "Beamer", "xrandr --output HDMI-0 --off --output DVI-D-0 --off --output DVI-I-0 --auto --primary" }
-}
+    xrandrmenu = {
+        { "Dual", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --right-of HDMI-0 --auto --output DVI-I-0 --off" },
+        { "Big", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --off --output DVI-I-0 --off" },
+        { "Beamer", "xrandr --output HDMI-0 --off --output DVI-D-0 --off --output DVI-I-0 --auto --primary" }
+    }
 
-mymainmenu = awful.menu({ items = {
-    { "Qutebrowser", "qutebrowser", "/usr/share/icons/hicolor/32x32/apps/qutebrowser.png" },
-    { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
-    { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
-    { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
-    { "Kodi", "kodiBeamer", "/usr/share/kodi/media/icon32x32.png" },
-    { "Video", videomenu },
-    { "XRandR", xrandrmenu },
-    { "Nuance laptop", "rdesk-nuanceLaptop.sh", os.getenv("HOME") .. "/.icons/nuance.png" },
-    { "Nuance VPN", "toggleNuanceVpn", os.getenv("HOME") .. "/.icons/nuance.png" },
-    { "awesome", myawesomemenu, beautiful.awesome_icon },
-    { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
-  }, 
-  theme = { height = 20, width = 200 }
-})
+    mymainmenu = awful.menu({ items = {
+        { "Qutebrowser", "qutebrowser", "/usr/share/icons/hicolor/32x32/apps/qutebrowser.png" },
+        { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
+        { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
+        { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
+        { "Kodi", "kodiBeamer", "/usr/share/kodi/media/icon32x32.png" },
+        { "Video", videomenu },
+        { "XRandR", xrandrmenu },
+        { "Nuance laptop", "rdesk-nuanceLaptop.sh", os.getenv("HOME") .. "/.icons/nuance.png" },
+        { "Nuance VPN", "toggleNuanceVpn", os.getenv("HOME") .. "/.icons/nuance.png" },
+        { "awesome", myawesomemenu, beautiful.awesome_icon },
+        { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
+      }, 
+      theme = { height = 20, width = 200 }
+    })
+else
+    mymainmenu = awful.menu({ items = {
+        { "Qutebrowser", "qutebrowser", "/usr/share/icons/hicolor/32x32/apps/qutebrowser.png" },
+        { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
+        { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
+        { "awesome", myawesomemenu, beautiful.awesome_icon },
+        { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
+      }, 
+      theme = { height = 20, width = 200 }
+    })
+end
 
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
@@ -173,32 +185,36 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- {{{ Nuance VPN
-nuanceVpnWidget = awful.widget.launcher({ image = os.getenv("HOME") .. "/.icons/nuanceBW.png",
-                                          command = "toggleNuanceVpn" })
-nuanceVpnUpdate = function()
-        if os.execute("pgrep vpnc > /dev/null") then
-            nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuance.png")
-        else
-            nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuanceBW.png")
+if not nuanceLaptop() then
+    nuanceVpnWidget = awful.widget.launcher({ image = os.getenv("HOME") .. "/.icons/nuanceBW.png",
+                                              command = "toggleNuanceVpn" })
+    nuanceVpnUpdate = function()
+            if os.execute("pgrep vpnc > /dev/null") then
+                nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuance.png")
+            else
+                nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuanceBW.png")
+            end
         end
-    end
-nuanceVpnUpdate()
-nuanceVpnTimer = timer({ timeout = 30 })
-nuanceVpnTimer:connect_signal("timeout", nuanceVpnUpdate)
-nuanceVpnTimer:start()
+    nuanceVpnUpdate()
+    nuanceVpnTimer = timer({ timeout = 30 })
+    nuanceVpnTimer:connect_signal("timeout", nuanceVpnUpdate)
+    nuanceVpnTimer:start()
+end
 -- }}}
 
 --- {{{ MPD
-mpdwidget = wibox.widget.textbox()
--- Register widget
-vicious.register(mpdwidget, vicious.widgets.mpd,
-    function (mpdwidget, args)
-        if args["{state}"] == "Stop" then 
-            return " MPD "
-        else 
-            return " "..args["{Artist}"]..' - '.. args["{Title}"].." "
-        end
-    end, 11)
+if not nuanceLaptop() then
+    mpdwidget = wibox.widget.textbox()
+    -- Register widget
+    vicious.register(mpdwidget, vicious.widgets.mpd,
+        function (mpdwidget, args)
+            if args["{state}"] == "Stop" then 
+                return " MPD "
+            else 
+                return " "..args["{Artist}"]..' - '.. args["{Title}"].." "
+            end
+        end, 11)
+end
 --- }}}
 
 -- {{{ Wibox
@@ -286,11 +302,11 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    right_layout:add(mpdwidget)
+    if not nuanceLaptop() then  right_layout:add(mpdwidget) end
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    right_layout:add(nuanceVpnWidget)
+    if not nuanceLaptop() then right_layout:add(nuanceVpnWidget) end
     right_layout:add(mylayoutbox[s])
-    right_layout:add(APW)
+    if not nuanceLaptop() then right_layout:add(APW) end
     right_layout:add(mytextclock)
 
     -- Now bring it all together (with the tasklist in the middle)
