@@ -93,7 +93,7 @@ end
 
 local sharetags_taglist = require("sharetags.taglist")
 
-if not sharetags.restore_taglist("/home/david/.awesome_taglist.txt") then
+if not sharetags.restore_taglist(os.getenv("HOME").."/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
     sharetags.add_tag("web", awful.layout.suit.tile.left)
     if not nuanceLaptop() then
@@ -105,7 +105,7 @@ end
 awesome.connect_signal("exit",
     function(restart)
         if restart then
-            sharetags.write_taglist("/home/david/.awesome_taglist.txt", {["Beamer"]=true})
+            sharetags.write_taglist(os.getenv("HOME").."/.awesome_taglist.txt", {["Beamer"]=true})
         end
     end)
 
@@ -381,7 +381,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "x", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "n", function () awful.util.spawn("/home/david/work/nuanceUrxvt.sh") end),
+    awful.key({ modkey,           }, "n", function () awful.util.spawn(os.getenv("HOME").."/work/nuanceUrxvt.sh") end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Control" }, "q", awesome.quit),
 
