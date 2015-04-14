@@ -18,6 +18,8 @@ local vicious = require("vicious")
 local hostname = os.getenv("HOST")
 function nuanceLaptop() return hostname ~= "arch-ac-nb-vilar" end
 
+local home = os.getenv("HOME")
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -93,7 +95,7 @@ end
 
 local sharetags_taglist = require("sharetags.taglist")
 
-if not sharetags.restore_taglist(os.getenv("HOME").."/.awesome_taglist.txt") then
+if not sharetags.restore_taglist(home.."/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
     sharetags.add_tag("web", awful.layout.suit.tile.left)
     if not nuanceLaptop() then
@@ -105,7 +107,7 @@ end
 awesome.connect_signal("exit",
     function(restart)
         if restart then
-            sharetags.write_taglist(os.getenv("HOME").."/.awesome_taglist.txt", {["Beamer"]=true})
+            sharetags.write_taglist(home.."/.awesome_taglist.txt", {["Beamer"]=true})
         end
     end)
 
@@ -158,10 +160,10 @@ if not nuanceLaptop() then
         { "Kodi", "kodiBeamer", "/usr/share/kodi/media/icon32x32.png" },
         { "Video", videomenu },
         { "XRandR", xrandrmenu },
-        { "Nuance laptop", "rdesk-nuanceLaptop.sh", os.getenv("HOME") .. "/.icons/nuance.png" },
-        { "Nuance VPN", "toggleNuanceVpn", os.getenv("HOME") .. "/.icons/nuance.png" },
+        { "Nuance laptop", "rdesk-nuanceLaptop.sh", home .. "/.icons/nuance.png" },
+        { "Nuance VPN", "toggleNuanceVpn", home .. "/.icons/nuance.png" },
         { "awesome", myawesomemenu, beautiful.awesome_icon },
-        { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
+        { "open terminal", terminal, home.."/.icons/tuxterminal.png" }
       }, 
       theme = { height = 20, width = 200 }
     })
@@ -171,7 +173,7 @@ else
         { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
         { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
         { "awesome", myawesomemenu, beautiful.awesome_icon },
-        { "open terminal", terminal, "/home/david/.icons/tuxterminal.png" }
+        { "open terminal", terminal, home.."/.icons/tuxterminal.png" }
       }, 
       theme = { height = 20, width = 200 }
     })
@@ -186,13 +188,13 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Nuance VPN
 if not nuanceLaptop() then
-    nuanceVpnWidget = awful.widget.launcher({ image = os.getenv("HOME") .. "/.icons/nuanceBW.png",
+    nuanceVpnWidget = awful.widget.launcher({ image = home .. "/.icons/nuanceBW.png",
                                               command = "toggleNuanceVpn" })
     nuanceVpnUpdate = function()
             if os.execute("pgrep vpnc > /dev/null") then
-                nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuance.png")
+                nuanceVpnWidget:set_image(home .. "/.icons/nuance.png")
             else
-                nuanceVpnWidget:set_image(os.getenv("HOME") .. "/.icons/nuanceBW.png")
+                nuanceVpnWidget:set_image(home .. "/.icons/nuanceBW.png")
             end
         end
     nuanceVpnUpdate()
@@ -381,7 +383,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "x", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "n", function () awful.util.spawn(os.getenv("HOME").."/work/nuanceUrxvt.sh") end),
+    awful.key({ modkey,           }, "n", function () awful.util.spawn(home.."/work/nuanceUrxvt.sh") end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Control" }, "q", awesome.quit),
 
