@@ -14,7 +14,6 @@ local menubar = require("menubar")
 local sharetags = require("sharetags")
 local myprompt = require("myprompt")
 local vicious = require("vicious")
---local APW=require("apw/widget")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -94,7 +93,7 @@ local sharetags_taglist = require("sharetags.taglist")
 if not sharetags.restore_taglist("/home/david/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
     sharetags.add_tag("web", awful.layout.suit.tile.left)
-    sharetags.add_tag("laptop", awful.layout.suit.tile)
+    sharetags.add_tag("laptop", awful.layout.suit.max)
     sharetags.add_tag("IM", awful.layout.suit.tile)
 end
 
@@ -151,6 +150,7 @@ xrandrmenu = {
 }
 
 mymainmenu = awful.menu({ items = {
+    { "Qutebrowser", "qutebrowser", "/usr/share/icons/hicolor/32x32/apps/qutebrowser.png" },
     { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
     { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
     { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
