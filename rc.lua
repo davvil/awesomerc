@@ -84,16 +84,6 @@ local layouts =
 }
 -- }}}
 
---[[
--- {{{ Wallpaper
-if beautiful.wallpaper then
-    for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
-    end
-end
--- }}}
---]]
-
 -- {{{ Tags
 
 local sharetags_taglist = require("sharetags.taglist")
@@ -357,12 +347,17 @@ globalkeys = awful.util.table.join(
             elseif curLayoutName == "tile" then
                 awful.layout.set(layouts[1])
             else
-                for name,_ in pairs(screen[mouse.screen].outputs) do
-                    if name == "HDMI-0" then -- Benq
-                        awful.layout.set(layouts[1])
-                    else
-                        awful.layout.set(layouts[2])
+                if not nuanceLaptop() then
+                    for name,_ in pairs(screen[mouse.screen].outputs) do
+                        naughty.notify({text = "In loop"})
+                        if name == "HDMI-0" then -- Benq
+                            awful.layout.set(layouts[1])
+                        else
+                            awful.layout.set(layouts[2])
+                        end
                     end
+                else
+                    awful.layout.set(layouts[1])
                 end
             end
         end),
@@ -491,6 +486,24 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
+
+-- Jump to a specific window with the number keys
+-- Be careful: we use keycodes to make it works on any keyboard layout.
+-- This should map on the top row of your keyboard, usually 1 to 9.
+-- (taken from the default rc.lua)
+for i = 1, 9 do
+    globalkeys = awful.util.table.join(globalkeys,
+        awful.key({ modkey }, "#" .. i+9,
+            function()
+                local clients = awful.client.tiled(mouse.screen)
+                if clients[i] then
+                    client.focus = clients[i]
+                    clients[i]:raise()
+                end
+            end
+    )
+    )
+end
 
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it works on any keyboard layout.
