@@ -15,6 +15,8 @@ local sharetags = require("sharetags")
 local myprompt = require("myprompt")
 local vicious = require("vicious")
 
+local myLayouts = require("myLayouts")
+
 local hostname = os.getenv("HOST")
 function nuanceLaptop() return hostname ~= "arch-ac-nb-vilar" end
 
@@ -69,6 +71,7 @@ local layouts =
     awful.layout.suit.tile.left,
     awful.layout.suit.tile,
     awful.layout.suit.max,
+    myLayouts.twoPane,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.fair,
     --awful.layout.suit.tile.top,
