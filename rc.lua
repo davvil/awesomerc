@@ -50,7 +50,8 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 --beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-beautiful.init("/usr/share/awesome/themes/zenburn/theme.lua")
+--beautiful.init("/usr/share/awesome/themes/zenburn/theme.lua")
+beautiful.init(home.."/.config/awesome/zenburnMod.lua")
 local APW=require("apw/widget")
 
 -- This is used later as the default terminal and editor to run.
