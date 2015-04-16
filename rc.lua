@@ -18,7 +18,7 @@ local vicious = require("vicious")
 local myLayouts = require("myLayouts")
 
 local hostname = os.getenv("HOST")
-function nuanceLaptop() return hostname ~= "arch-ac-nb-vilar" end
+function nuanceLaptop() return hostname == "arch-ac-nb-vilar" end
 
 local home = os.getenv("HOME")
 
