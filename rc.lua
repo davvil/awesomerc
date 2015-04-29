@@ -91,7 +91,7 @@ local sharetags_taglist = require("sharetags.taglist")
 
 if not sharetags.restore_taglist(home.."/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
-    sharetags.add_tag("web", awful.layout.suit.tile.left)
+    sharetags.add_tag("web", awful.layout.suit.max)
     if not nuanceLaptop() then
         sharetags.add_tag("laptop", awful.layout.suit.max)
     end
@@ -350,7 +350,6 @@ globalkeys = awful.util.table.join(
             else
                 if not nuanceLaptop() then
                     for name,_ in pairs(screen[mouse.screen].outputs) do
-                        naughty.notify({text = "In loop"})
                         if name == "HDMI-0" then -- Benq
                             awful.layout.set(layouts[1])
                         else
