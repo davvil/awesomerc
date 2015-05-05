@@ -17,8 +17,11 @@ local vicious = require("vicious")
 
 local myLayouts = require("myLayouts")
 
-local hostname = os.getenv("HOST")
-function nuanceLaptop() return hostname == "arch-ac-nb-vilar" end
+local hnHandle = io.popen("hostname")
+-- See http://rosettacode.org/wiki/Strip_whitespace_from_a_string/Top_and_tail#Lua
+local hostname=hnHandle:read("*a"):match("^%s*(.-)%s*$")
+local isNuanceLaptop = (hostname == "arch-ac-nb-vilar")
+hnHandle:close()
 
 local home = os.getenv("HOME")
 
@@ -92,7 +95,7 @@ local sharetags_taglist = require("sharetags.taglist")
 if not sharetags.restore_taglist(home.."/.awesome_taglist.txt") then
     sharetags.add_tag("general", awful.layout.suit.tile)
     sharetags.add_tag("web", awful.layout.suit.max)
-    if not nuanceLaptop() then
+    if not isNuanceLaptop then
         sharetags.add_tag("laptop", awful.layout.suit.max)
     end
     sharetags.add_tag("IM", awful.layout.suit.tile)
@@ -106,7 +109,7 @@ awesome.connect_signal("exit",
     end)
 
 
-if not nuanceLaptop() then
+if not isNuanceLaptop then
     for s=1,screen.count() do
         for name,_ in pairs(screen[s].outputs) do
             if name == "HDMI-0" then -- Benq
@@ -132,7 +135,7 @@ myawesomemenu = {
    { "quit", awesome.quit }
 }
 
-if not nuanceLaptop() then
+if not isNuanceLaptop then
     videomenu = {
         { "Netflix", "netflixBeamer" },
         { "Kodi", "kodiBeamer" },
@@ -181,7 +184,7 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- {{{ Nuance VPN
-if not nuanceLaptop() then
+if not isNuanceLaptop then
     nuanceVpnWidget = awful.widget.launcher({ image = home .. "/.icons/nuanceBW.png",
                                               command = "toggleNuanceVpn" })
     nuanceVpnUpdate = function()
@@ -199,7 +202,7 @@ end
 -- }}}
 
 --- {{{ MPD
-if not nuanceLaptop() then
+if not isNuanceLaptop then
     mpdwidget = wibox.widget.textbox()
     -- Register widget
     vicious.register(mpdwidget, vicious.widgets.mpd,
@@ -298,11 +301,11 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if not nuanceLaptop() then  right_layout:add(mpdwidget) end
+    if not isNuanceLaptop then  right_layout:add(mpdwidget) end
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    if not nuanceLaptop() then right_layout:add(nuanceVpnWidget) end
+    if not isNuanceLaptop then right_layout:add(nuanceVpnWidget) end
     right_layout:add(mylayoutbox[s])
-    if not nuanceLaptop() then right_layout:add(APW) end
+    if not isNuanceLaptop then right_layout:add(APW) end
     right_layout:add(mytextclock)
 
     -- Now bring it all together (with the tasklist in the middle)
@@ -348,7 +351,7 @@ globalkeys = awful.util.table.join(
             elseif curLayoutName == "tile" then
                 awful.layout.set(layouts[1])
             else
-                if not nuanceLaptop() then
+                if not isNuanceLaptop then
                     for name,_ in pairs(screen[mouse.screen].outputs) do
                         if name == "HDMI-0" then -- Benq
                             awful.layout.set(layouts[1])
