@@ -376,6 +376,11 @@ globalkeys = awful.util.table.join(
             awful.client.focus.history.previous()
             if client.focus then
                 client.focus:raise()
+                local clientGeometry = client.focus:geometry()
+                local mouseCoords = {}
+                mouseCoords.x = clientGeometry.x + clientGeometry.width - 20;
+                mouseCoords.y = clientGeometry.y + clientGeometry.height - 20;
+                mouse.coords(mouseCoords)
             end
         end),
 
@@ -609,10 +614,9 @@ awful.rules.rules = {
                      skip_taskbar = true, border_width = 0,
                      focusable = false } },
     { rule = { name = "rdesktop - 10.0.0.5" },
-      properties = { border_width = 0 } }
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+      properties = { border_width = 0 } },
+    { rule = { instance = "plugin-container" },
+      properties = { floating = true } }
 }
 
 if sharetags.tags["Beamer"] then
