@@ -114,9 +114,9 @@ if not isNuanceLaptop then
         for name,_ in pairs(screen[s].outputs) do
             if name == "HDMI-0" then -- Benq
                 sharetags.select_tag(sharetags.tags["web"], screen[s].index)
-            elseif name == "DVI-D-0" then -- Samsung
+            elseif name == "DP-3" then -- Samsung
                 sharetags.select_tag(sharetags.tags["general"], screen[s].index)
-            elseif name == "DVI-I-0" then -- Samsung
+            elseif name == "DVI-I-0" then -- Beamer
                 sharetags.add_tag("Beamer", awful.layout.suit.max)
                 sharetags.select_tag(sharetags.tags["Beamer"], screen[s].index)
             end
@@ -144,9 +144,9 @@ if not isNuanceLaptop then
     }
 
     xrandrmenu = {
-        { "Dual", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --right-of HDMI-0 --auto --output DVI-I-0 --off" },
-        { "Big", "xrandr --output HDMI-0 --primary --auto --output DVI-D-0 --off --output DVI-I-0 --off" },
-        { "Beamer", "xrandr --output HDMI-0 --off --output DVI-D-0 --off --output DVI-I-0 --auto --primary" }
+        { "Dual", "xrandr --output HDMI-0 --primary --auto --output DP-3 --right-of HDMI-0 --auto --output DVI-I-0 --off" },
+        { "Big", "xrandr --output HDMI-0 --primary --auto --output DP-3 --off --output DVI-I-0 --off" },
+        { "Beamer", "xrandr --output HDMI-0 --off --output DP-3 --off --output DVI-I-0 --auto --primary" }
     }
 
     mymainmenu = awful.menu({ items = {
@@ -158,7 +158,7 @@ if not isNuanceLaptop then
         { "Video", videomenu },
         { "XRandR", xrandrmenu },
         { "Nuance laptop", "rdesk-nuanceLaptop.sh", home .. "/.icons/nuance.png" },
-        { "Nuance VPN", "toggleNuanceVpn", home .. "/.icons/nuance.png" },
+        { "Nuance VPN", "nuanceVpnToggle", home .. "/.icons/nuance.png" },
         { "awesome", myawesomemenu, beautiful.awesome_icon },
         { "open terminal", terminal, home.."/.icons/tuxterminal.png" }
       }, 
@@ -185,13 +185,21 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Nuance VPN
 if not isNuanceLaptop then
+    alienLedSetTo="none"
     nuanceVpnWidget = awful.widget.launcher({ image = home .. "/.icons/nuanceBW.png",
-                                              command = "toggleNuanceVpn" })
+                                              command = "nuanceVpnToggle" })
     nuanceVpnUpdate = function()
-            if os.execute("pgrep vpnc > /dev/null") then
+            local setLedTo="none" -- We set the led indirectly so that the user can change it if desired
+            if os.execute("pgrep openconnect > /dev/null") then
                 nuanceVpnWidget:set_image(home .. "/.icons/nuance.png")
+                setLedTo="green"
             else
                 nuanceVpnWidget:set_image(home .. "/.icons/nuanceBW.png")
+                setLedTo="purple"
+            end
+            if alienLedSetTo ~= setLedTo then
+                os.execute(home .. "/bin/alienLed " .. setLedTo)
+                alienLedSetTo=setLedTo
             end
         end
     nuanceVpnUpdate()
@@ -237,9 +245,10 @@ mytaglist.buttons = awful.util.table.join(
 mytasklist = {}
 mytasklist.buttons = awful.util.table.join(
                      awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
+                                              --if c == client.focus then
+                                              --    c.minimized = true
+                                              --else
+                                              if c ~= client.focus then
                                                   -- Without this, the following
                                                   -- :isvisible() makes no sense
                                                   c.minimized = false
@@ -474,7 +483,7 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "q",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey,           }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DVI-D-0"].index) end),
+    awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end),
     awful.key({ modkey, "Shift"   }, "o",      awful.client.movetoscreen                        ),
     --awful.key({ modkey, "Shift"   }, "o",      function (c)
     --        local curidx = awful.tag.getidx()
