@@ -24,6 +24,7 @@ local isNuanceLaptop = (hostname == "arch-ac-nb-vilar")
 hnHandle:close()
 
 local home = os.getenv("HOME")
+local iconDir = home.."/.icons"
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -135,12 +136,18 @@ myawesomemenu = {
    { "quit", awesome.quit }
 }
 
+myquitmenu = {
+    { "Suspend", function () os.execute("sudo systemctl suspend") end, iconDir.."/suspend.png"},
+    { "Shutdown", function () os.execute("sudo systemctl poweroff") end, iconDir.."/poweroff.png" },
+    { "Reboot", function () os.execute("sudo systemctl reboot") end, iconDir.."/restart.svg" },
+}
+
 if not isNuanceLaptop then
     videomenu = {
-        { "Netflix", "netflixBeamer" },
-        { "Kodi", "kodiBeamer" },
-        { "Netflix (all screens)", "netflixBeamerAllScreens" },
-        { "Kodi (all screens)", "kodiBeamerAllScreens" }
+        { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico"  },
+        { "Kodi", "kodiBeamer", "/usr/share/icons/hicolor/32x32/apps/steam.png"  },
+        { "Netflix (all screens)", "netflixBeamerAllScreens", "/home/david/.icons/netflix.ico"  },
+        { "Kodi (all screens)", "kodiBeamerAllScreens", "/usr/share/icons/hicolor/32x32/apps/steam.png"  }
     }
 
     xrandrmenu = {
@@ -154,13 +161,16 @@ if not isNuanceLaptop then
         { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
         { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
         { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
-        { "Kodi", "kodiBeamer", "/usr/share/kodi/media/icon32x32.png" },
-        { "Video", videomenu },
-        { "XRandR", xrandrmenu },
-        { "Nuance laptop", "rdesk-nuanceLaptop.sh", home .. "/.icons/nuance.png" },
-        { "Nuance VPN", "nuanceVpnToggle", home .. "/.icons/nuance.png" },
+        { "Skype", "skype", "/usr/share/icons/hicolor/32x32/apps/skype.png" },
+        { "Steam", "steam", "/usr/share/icons/hicolor/32x32/apps/steam.png" },
+        { "Kodi", "kodiBeamer", iconDir.."/kodi.png" },
+        { "Video", videomenu, iconDir.."/video.png" },
+        { "XRandR", xrandrmenu, iconDir.."/xrandr.png" },
+        { "Nuance laptop", "rdesk-nuanceLaptop.sh", iconDir.."/nuance.png" },
+        { "Nuance VPN", "nuanceVpnToggle", iconDir.."/nuance.png" },
         { "awesome", myawesomemenu, beautiful.awesome_icon },
-        { "open terminal", terminal, home.."/.icons/tuxterminal.png" }
+        { "open terminal", terminal, iconDir.."/tuxterminal.png" },
+        { "Quit", myquitmenu, iconDir.."/power.png" }
       }, 
       theme = { height = 20, width = 200 }
     })
@@ -170,7 +180,7 @@ else
         { "Firefox", "firefox", "/usr/share/icons/hicolor/32x32/apps/firefox.png" },
         { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
         { "awesome", myawesomemenu, beautiful.awesome_icon },
-        { "open terminal", terminal, home.."/.icons/tuxterminal.png" }
+        { "open terminal", terminal, iconDir.."/tuxterminal.png" }
       }, 
       theme = { height = 20, width = 200 }
     })
@@ -186,15 +196,15 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- {{{ Nuance VPN
 if not isNuanceLaptop then
     alienLedSetTo="none"
-    nuanceVpnWidget = awful.widget.launcher({ image = home .. "/.icons/nuanceBW.png",
+    nuanceVpnWidget = awful.widget.launcher({ image = iconDir.."/nuanceBW.png",
                                               command = "nuanceVpnToggle" })
     nuanceVpnUpdate = function()
             local setLedTo="none" -- We set the led indirectly so that the user can change it if desired
             if os.execute("pgrep openconnect > /dev/null") then
-                nuanceVpnWidget:set_image(home .. "/.icons/nuance.png")
+                nuanceVpnWidget:set_image(iconDir.."/nuance.png")
                 setLedTo="green"
             else
-                nuanceVpnWidget:set_image(home .. "/.icons/nuanceBW.png")
+                nuanceVpnWidget:set_image(iconDir.."/nuanceBW.png")
                 setLedTo="purple"
             end
             if alienLedSetTo ~= setLedTo then
@@ -401,6 +411,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "n", function () awful.util.spawn(home.."/work/nuanceUrxvt.sh") end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Control" }, "q", awesome.quit),
+    awful.key({ modkey, "Control" }, "Escape", function () os.execute("sudo systemctl suspend") end),
 
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
