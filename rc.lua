@@ -145,9 +145,9 @@ myquitmenu = {
 if not isNuanceLaptop then
     videomenu = {
         { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico"  },
-        { "Kodi", "kodiBeamer", "/usr/share/icons/hicolor/32x32/apps/steam.png"  },
+        { "Kodi", "kodiBeamer", iconDir.."/kodi.png" },
         { "Netflix (all screens)", "netflixBeamerAllScreens", "/home/david/.icons/netflix.ico"  },
-        { "Kodi (all screens)", "kodiBeamerAllScreens", "/usr/share/icons/hicolor/32x32/apps/steam.png"  }
+        { "Kodi (all screens)", "kodiBeamerAllScreens", iconDir.."/kodi.png" }
     }
 
     xrandrmenu = {
