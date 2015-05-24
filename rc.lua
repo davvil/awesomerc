@@ -483,10 +483,13 @@ globalkeys = awful.util.table.join(
     --awful.key({ modkey }, "p", function() menubar.show() end)
 
     -- MPD control
-    awful.key({ modkey }, "F9", function () awful.util.spawn("mpc toggle") end),
-    awful.key({ modkey }, "F10", function () awful.util.spawn("mpc stop") end),
-    awful.key({ modkey }, "F11", function () awful.util.spawn("mpc prev") end),
-    awful.key({ modkey }, "F12", function () awful.util.spawn("mpc next") end)
+    awful.key({ modkey }, "F9",  function() os.execute("mpc toggle") end),
+    awful.key({ modkey }, "F10", function() os.execute("mpc stop") end),
+    awful.key({ modkey }, "F11", function() os.execute("mpc prev") end),
+    awful.key({ modkey }, "F12", function() os.execute("mpc next") end),
+
+    -- Eject CD
+    awful.key({}, "Multi_key", function() os.execute("eject") end)
 )
 
 clientkeys = awful.util.table.join(
