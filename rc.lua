@@ -162,7 +162,7 @@ if not isNuanceLaptop then
         { "Pidgin", "pidgin", "/usr/share/icons/hicolor/32x32/apps/pidgin.png" },
         { "Netflix", "netflixBeamer", "/home/david/.icons/netflix.ico" },
         { "Skype", "skype", "/usr/share/icons/hicolor/32x32/apps/skype.png" },
-        { "Steam", "steam", "/usr/share/icons/hicolor/32x32/apps/steam.png" },
+        { "Steam", home.."/bin/steam", "/usr/share/icons/hicolor/32x32/apps/steam.png" },
         { "Kodi", "kodiBeamer", iconDir.."/kodi.png" },
         { "Video", videomenu, iconDir.."/video.png" },
         { "XRandR", xrandrmenu, iconDir.."/xrandr.png" },

@@ -13,9 +13,9 @@ function twoPane.arrange(p)
         geometry.height = height - 2*c.border_width
         geometry.y = yIni
         if k == 1 then
-            geometry.x = xIni
-        else
             geometry.x = xIni + midX
+        else
+            geometry.x = xIni
         end
         c:geometry(geometry)
     end
