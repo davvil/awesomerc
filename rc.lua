@@ -447,7 +447,13 @@ globalkeys = awful.util.table.join(
                       nil, nil, nil, nil,
                       keyPressFunc)
               end),
-    awful.key({ modkey }, "slash", function() sharetags.select_tag(sharetags.tags["IM"], mouse.screen) end),
+    awful.key({ modkey }, "slash", function() 
+            if awful.tag.selected(mouse.screen).name == "IM" then
+                awful.tag.history.restore()
+            else
+                sharetags.select_tag(sharetags.tags["IM"], mouse.screen)
+            end
+        end),
     awful.key({ "Control" }, "F13", awful.tag.history.restore),
     awful.key({ "Shift" }, "F13",
               function ()
