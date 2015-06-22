@@ -533,11 +533,11 @@ clientkeys = awful.util.table.join(
 
 -- Swapping screens, the monitor names change depending if we are on the laptop or not
 if isNuanceLaptop then
-    clientkeys = awful.util.table.join(clientkeys,
+    globalkeys = awful.util.table.join(globalkeys,
         awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["VGA-0"].index, screen["VGA-1"].index) end)
     )
 else
-    clientkeys = awful.util.table.join(clientkeys,
+    globalkeys = awful.util.table.join(globalkeys,
         awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end)
     )
 end
@@ -559,78 +559,6 @@ for i = 1, 9 do
     )
     )
 end
-
--- Bind all key numbers to tags.
--- Be careful: we use keycodes to make it works on any keyboard layout.
--- This should map on the top row of your keyboard, usually 1 to 9.
--- for i = 1, 9 do
---     globalkeys = awful.util.table.join(globalkeys,
---         -- View tag only.
---         awful.key({ modkey }, "#" .. i + 9,
---                   function ()
---                         local screen = mouse.screen
---                         local tag = awful.tag.gettags(screen)[i]
---                         if tag then
---                            awful.tag.viewonly(tag)
---                         end
---                   end),
---         -- Toggle tag.
---         awful.key({ modkey, "Control" }, "#" .. i + 9,
---                   function ()
---                       local screen = mouse.screen
---                       local tag = awful.tag.gettags(screen)[i]
---                       if tag then
---                          awful.tag.viewtoggle(tag)
---                       end
---                   end),
---         -- Move client to tag.
---         awful.key({ modkey, "Shift" }, "#" .. i + 9,
---                   function ()
---                       if client.focus then
---                           local tag = awful.tag.gettags(client.focus.screen)[i]
---                           if tag then
---                               awful.client.movetotag(tag)
---                           end
---                      end
---                   end),
---         -- Toggle tag.
---         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
---                   function ()
---                       if client.focus then
---                           local tag = awful.tag.gettags(client.focus.screen)[i]
---                           if tag then
---                               awful.client.toggletag(tag)
---                           end
---                       end
---                   end))
--- end
-
---local keys = {"#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18"}
---
---for i, key in ipairs(keys) do
---        globalkeys = awful.util.table.join(globalkeys,
---        awful.key({ modkey }, key,
---                  function ()
---                      local screen = mouse.screen
---                      local tag = tags[i]
---                      sharetags.select_tag(tag, screen)
---
---                  end),
---        awful.key({ modkey, "Control" }, key,
---                  function ()
---                      local screen = mouse.screen
---                      local tag = tags[i]
---                      sharetags.toggle_tag(tag, screen)
---                  end),
---        awful.key({ modkey, "Shift" }, key,
---                  function ()
---                      if client.focus then
---                          local tag = tags[i]
---                          awful.client.movetotag(tag)
---                     end
---                  end)
---        )
---end
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
