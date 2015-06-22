@@ -124,7 +124,15 @@ if not isNuanceLaptop then
         end
     end
 else
-    sharetags.select_tag(sharetags.tags["general"], 1)
+    for s=1,screen.count() do
+        for name,_ in pairs(screen[s].outputs) do
+            if name == "VGA-0" then -- Laptop monitor
+                sharetags.select_tag(sharetags.tags["general"], screen[s].index)
+            elseif name == "VGA-1" then -- External monitor
+                sharetags.select_tag(sharetags.tags["web"], screen[s].index)
+            end
+        end
+    end
 end
 
 -- {{{ Menu
@@ -503,7 +511,6 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "q",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey,           }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end),
     awful.key({ modkey, "Shift"   }, "o",      awful.client.movetoscreen                        ),
     --awful.key({ modkey, "Shift"   }, "o",      function (c)
     --        local curidx = awful.tag.getidx()
@@ -523,6 +530,17 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
+
+-- Swapping screens, the monitor names change depending if we are on the laptop or not
+if isNuanceLaptop then
+    clientkeys = awful.util.table.join(clientkeys,
+        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["VGA-0"].index, screen["VGA-1"].index) end)
+    )
+else
+    clientkeys = awful.util.table.join(clientkeys,
+        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end)
+    )
+end
 
 -- Jump to a specific window with the number keys
 -- Be careful: we use keycodes to make it works on any keyboard layout.
