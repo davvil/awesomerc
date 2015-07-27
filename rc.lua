@@ -226,7 +226,8 @@ if not isNuanceLaptop then
     vicious.register(mpdwidget, vicious.widgets.mpd,
         function (mpdwidget, args)
             if args["{state}"] == "Stop" then 
-                return " MPD "
+                --return " MPD "
+                return ""
             else 
                 return " "..args["{Artist}"]..' - '.. args["{Title}"].." "
             end
