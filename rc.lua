@@ -17,6 +17,9 @@ local vicious = require("vicious")
 
 local myLayouts = require("myLayouts")
 
+local pomodoro = require("pomodoro")
+pomodoro.init()
+
 local hnHandle = io.popen("hostname")
 -- See http://rosettacode.org/wiki/Strip_whitespace_from_a_string/Top_and_tail#Lua
 local hostname=hnHandle:read("*a"):match("^%s*(.-)%s*$")
@@ -123,8 +126,6 @@ if not isNuanceLaptop then
             end
         end
     end
-else
-    sharetags.select_tag(sharetags.tags["general"], 1)
 end
 
 -- {{{ Menu
@@ -322,6 +323,8 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if not isNuanceLaptop then  right_layout:add(mpdwidget) end
+    -- right_layout:add(pomodoro.icon_widget)
+    right_layout:add(pomodoro.widget)
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     if not isNuanceLaptop then right_layout:add(nuanceVpnWidget) end
     right_layout:add(mylayoutbox[s])
@@ -504,7 +507,6 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "q",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey,           }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end),
     awful.key({ modkey, "Shift"   }, "o",      awful.client.movetoscreen                        ),
     --awful.key({ modkey, "Shift"   }, "o",      function (c)
     --        local curidx = awful.tag.getidx()
@@ -525,6 +527,17 @@ clientkeys = awful.util.table.join(
         end)
 )
 
+-- Swapping screens, the monitor names change depending if we are on the laptop or not
+if isNuanceLaptop then
+    globalkeys = awful.util.table.join(globalkeys,
+        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["VGA-0"].index, screen["VGA-1"].index) end)
+    )
+else
+    globalkeys = awful.util.table.join(globalkeys,
+        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end)
+    )
+end
+
 -- Jump to a specific window with the number keys
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
@@ -542,78 +555,6 @@ for i = 1, 9 do
     )
     )
 end
-
--- Bind all key numbers to tags.
--- Be careful: we use keycodes to make it works on any keyboard layout.
--- This should map on the top row of your keyboard, usually 1 to 9.
--- for i = 1, 9 do
---     globalkeys = awful.util.table.join(globalkeys,
---         -- View tag only.
---         awful.key({ modkey }, "#" .. i + 9,
---                   function ()
---                         local screen = mouse.screen
---                         local tag = awful.tag.gettags(screen)[i]
---                         if tag then
---                            awful.tag.viewonly(tag)
---                         end
---                   end),
---         -- Toggle tag.
---         awful.key({ modkey, "Control" }, "#" .. i + 9,
---                   function ()
---                       local screen = mouse.screen
---                       local tag = awful.tag.gettags(screen)[i]
---                       if tag then
---                          awful.tag.viewtoggle(tag)
---                       end
---                   end),
---         -- Move client to tag.
---         awful.key({ modkey, "Shift" }, "#" .. i + 9,
---                   function ()
---                       if client.focus then
---                           local tag = awful.tag.gettags(client.focus.screen)[i]
---                           if tag then
---                               awful.client.movetotag(tag)
---                           end
---                      end
---                   end),
---         -- Toggle tag.
---         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
---                   function ()
---                       if client.focus then
---                           local tag = awful.tag.gettags(client.focus.screen)[i]
---                           if tag then
---                               awful.client.toggletag(tag)
---                           end
---                       end
---                   end))
--- end
-
---local keys = {"#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18"}
---
---for i, key in ipairs(keys) do
---        globalkeys = awful.util.table.join(globalkeys,
---        awful.key({ modkey }, key,
---                  function ()
---                      local screen = mouse.screen
---                      local tag = tags[i]
---                      sharetags.select_tag(tag, screen)
---
---                  end),
---        awful.key({ modkey, "Control" }, key,
---                  function ()
---                      local screen = mouse.screen
---                      local tag = tags[i]
---                      sharetags.toggle_tag(tag, screen)
---                  end),
---        awful.key({ modkey, "Shift" }, key,
---                  function ()
---                      if client.focus then
---                          local tag = tags[i]
---                          awful.client.movetotag(tag)
---                     end
---                  end)
---        )
---end
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
