@@ -17,6 +17,9 @@ local vicious = require("vicious")
 
 local myLayouts = require("myLayouts")
 
+local pomodoro = require("pomodoro")
+pomodoro.init()
+
 local hnHandle = io.popen("hostname")
 -- See http://rosettacode.org/wiki/Strip_whitespace_from_a_string/Top_and_tail#Lua
 local hostname=hnHandle:read("*a"):match("^%s*(.-)%s*$")
@@ -120,16 +123,6 @@ if not isNuanceLaptop then
             elseif name == "DVI-I-0" then -- Beamer
                 sharetags.add_tag("Beamer", awful.layout.suit.max)
                 sharetags.select_tag(sharetags.tags["Beamer"], screen[s].index)
-            end
-        end
-    end
-else
-    for s=1,screen.count() do
-        for name,_ in pairs(screen[s].outputs) do
-            if name == "VGA-0" then -- Laptop monitor
-                sharetags.select_tag(sharetags.tags["general"], screen[s].index)
-            elseif name == "VGA-1" then -- External monitor
-                sharetags.select_tag(sharetags.tags["web"], screen[s].index)
             end
         end
     end
@@ -329,6 +322,8 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if not isNuanceLaptop then  right_layout:add(mpdwidget) end
+    -- right_layout:add(pomodoro.icon_widget)
+    right_layout:add(pomodoro.widget)
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     if not isNuanceLaptop then right_layout:add(nuanceVpnWidget) end
     right_layout:add(mylayoutbox[s])
