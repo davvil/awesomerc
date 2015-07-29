@@ -19,14 +19,18 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     pomodoro.npomodoros = 0
     pomodoro.pause_duration = pomodoro.short_pause_duration
     pomodoro.change = 60
-
+    pomodoro.doShow = false
 
     -- pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
     pomodoro.format = function (t)
-        if pomodoro.working then
-            return "Work: <b>" .. t .. "</b>"
+        if pomodoro.doShow then
+            if pomodoro.working then
+                return "Work: <b>" .. t .. "</b>"
+            else
+                return "Pause: <b>" .. t .. "</b>"
+            end
         else
-            return "Pause: <b>" .. t .. "</b>"
+            return ""
         end
     end
     pomodoro.pause_title = "Pause finished."
@@ -93,6 +97,16 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         pomodoro.left = pomodoro.work_duration
         pomodoro:settime(pomodoro.work_duration)
         set_pomodoro_icon('gray')
+    end
+
+    function pomodoro:show()
+        pomodoro.doShow = true
+        pomodoro.ticking_time()
+    end
+
+    function pomodoro:hide()
+        pomodoro.doShow = false
+        pomodoro.stop()
     end
 
     function pomodoro:increase_time()

@@ -19,6 +19,9 @@ local myLayouts = require("myLayouts")
 
 local pomodoro = require("pomodoro")
 pomodoro.init()
+if isNuanceLaptop then
+    pomodoro.show()
+end
 
 local hnHandle = io.popen("hostname")
 -- See http://rosettacode.org/wiki/Strip_whitespace_from_a_string/Top_and_tail#Lua
@@ -204,9 +207,11 @@ if not isNuanceLaptop then
             if os.execute("pgrep openconnect > /dev/null") then
                 nuanceVpnWidget:set_image(iconDir.."/nuance.png")
                 setLedTo="green"
+                pomodoro.show()
             else
                 nuanceVpnWidget:set_image(iconDir.."/nuanceBW.png")
                 setLedTo="purple"
+                pomodoro.hide()
             end
             if alienLedSetTo ~= setLedTo then
                 os.execute(home .. "/bin/alienLed " .. setLedTo)
@@ -322,9 +327,9 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if not isNuanceLaptop then  right_layout:add(mpdwidget) end
     -- right_layout:add(pomodoro.icon_widget)
     right_layout:add(pomodoro.widget)
+    if not isNuanceLaptop then  right_layout:add(mpdwidget) end
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     if not isNuanceLaptop then right_layout:add(nuanceVpnWidget) end
     right_layout:add(mylayoutbox[s])
