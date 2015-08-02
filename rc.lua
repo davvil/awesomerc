@@ -117,13 +117,29 @@ awesome.connect_signal("exit",
 
 
 if not isNuanceLaptop then
+    local hnMonitorHandle = io.popen(home.."/bin/getMonitors.sh")
+    while true do
+        local line=hnMonitorHandle:read("*line")
+        if line == nil then break end
+        local output = string.gsub(line, " .*$", "")
+        local monitorName = string.gsub(line, "^[^ ]* ", "")
+        beamerMonitor = "DP-0" -- Default and in order to always have a value for it
+        if monitorName == "BenQ GW2765" then
+            benqMonitor = output
+        elseif monitorName == "SyncMaster" then
+            samsungMonitor = output
+        elseif monitorName == "EPSON PJ" then
+            beamerMonitor = output
+        end
+    end
+    
     for s=1,screen.count() do
         for name,_ in pairs(screen[s].outputs) do
-            if name == "HDMI-0" then -- Benq
+            if name == benqMonitor then
                 sharetags.select_tag(sharetags.tags["web"], screen[s].index)
-            elseif name == "DP-3" then -- Samsung
+            elseif name == samsungMonitor then
                 sharetags.select_tag(sharetags.tags["general"], screen[s].index)
-            elseif name == "DVI-I-0" then -- Beamer
+            elseif name == beamerMonitor then
                 sharetags.add_tag("Beamer", awful.layout.suit.max)
                 sharetags.select_tag(sharetags.tags["Beamer"], screen[s].index)
             end
@@ -155,9 +171,9 @@ if not isNuanceLaptop then
     }
 
     xrandrmenu = {
-        { "Dual", "xrandr --output HDMI-0 --primary --auto --output DP-3 --right-of HDMI-0 --auto --output DVI-I-0 --off" },
-        { "Big", "xrandr --output HDMI-0 --primary --auto --output DP-3 --off --output DVI-I-0 --off" },
-        { "Beamer", "xrandr --output HDMI-0 --off --output DP-3 --off --output DVI-I-0 --auto --primary" }
+        { "Dual", "xrandr --output "..benqMonitor.." --primary --auto --output "..samsungMonitor.." --right-of "..benqMonitor.." --auto --output "..beamerMonitor.." --off" },
+        { "Big", "xrandr --output "..benqMonitor.." --primary --auto --output "..samsungMonitor.." --off --output "..beamerMonitor.." --off" },
+        { "Beamer", "xrandr --output "..benqMonitor.." --off --output "..samsungMonitor.." --off --output "..beamerMonitor.." --auto --primary" }
     }
 
     mymainmenu = awful.menu({ items = {
@@ -381,7 +397,7 @@ globalkeys = awful.util.table.join(
             else
                 if not isNuanceLaptop then
                     for name,_ in pairs(screen[mouse.screen].outputs) do
-                        if name == "HDMI-0" then -- Benq
+                        if name == benqMonitor then
                             awful.layout.set(layouts[1])
                         else
                             awful.layout.set(layouts[2])
@@ -539,7 +555,7 @@ if isNuanceLaptop then
     )
 else
     globalkeys = awful.util.table.join(globalkeys,
-        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen["HDMI-0"].index, screen["DP-3"].index) end)
+        awful.key({ modkey,           }, "o",      function() sharetags.swap_screen(screen[benqMonitor].index, screen[samsungMonitor].index) end)
     )
 end
 
