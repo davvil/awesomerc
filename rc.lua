@@ -123,7 +123,6 @@ if not isNuanceLaptop then
         if line == nil then break end
         local output = string.gsub(line, " .*$", "")
         local monitorName = string.gsub(line, "^[^ ]* ", "")
-        beamerMonitor = "DP-0" -- Default and in order to always have a value for it
         if monitorName == "BenQ GW2765" then
             benqMonitor = output
         elseif monitorName == "SyncMaster" then
@@ -171,9 +170,9 @@ if not isNuanceLaptop then
     }
 
     xrandrmenu = {
-        { "Dual", "xrandr --output "..benqMonitor.." --primary --auto --output "..samsungMonitor.." --right-of "..benqMonitor.." --auto --output "..beamerMonitor.." --off" },
-        { "Big", "xrandr --output "..benqMonitor.." --primary --auto --output "..samsungMonitor.." --off --output "..beamerMonitor.." --off" },
-        { "Beamer", "xrandr --output "..benqMonitor.." --off --output "..samsungMonitor.." --off --output "..beamerMonitor.." --auto --primary" }
+        { "Dual", "/home/david/bin/setupMonitors.sh Dual" },
+        { "Big",  "/home/david/bin/setupMonitors.sh Big" },
+        { "Beamer",  "/home/david/bin/setupMonitors.sh Beamer" }
     }
 
     mymainmenu = awful.menu({ items = {
